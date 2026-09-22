@@ -198,6 +198,20 @@ ${req.query.err ? '<p class="err">Incorrect password</p>' : ''}
 
   // ── Auto-launch if already configured ─────────────────────────
   if (await config.isAlreadyConfigured()) {
+    // Migrate legacy workspace setup state before launching.
+    // openclaw >=2026.9 refuses to start (exit 78, gateway.maintenance_required)
+    // when /data/.openclaw/workspace is in the pre-migration format.
+    // This is a no-op when nothing needs migrating.
+    try {
+      log.info('Running openclaw doctor --fix (workspace state migration)...');
+      const out = execFileSync(OPENCLAW_NODE, [OPENCLAW_ENTRY, 'doctor', '--fix'], {
+        encoding: 'utf8',
+        timeout: 120_000,
+      });
+      log.info(`doctor --fix output:\n${out}`);
+    } catch (err) {
+      log.warn(`doctor --fix failed (continuing anyway): ${err.message}`);
+    }
     log.info('Existing config found — launching OpenClaw gateway automatically...');
     try {
       await gatewayManager.start();
