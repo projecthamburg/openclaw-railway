@@ -196,6 +196,23 @@ apiRoutes.post('/pairing/approve', async (req, res) => {
 });
 
 /**
+ * GET variant of pairing approve (for browser navigation without JS).
+ * Same admin auth required.
+ */
+apiRoutes.get('/pairing/approve', async (req, res) => {
+  const { requestId } = req.query;
+  if (!requestId) {
+    return res.status(400).json({ ok: false, error: 'requestId query param required' });
+  }
+  try {
+    await pairingService.approve(requestId);
+    res.json({ ok: true, message: `Request ${requestId} approved` });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/**
  * Reject a pending pair request
  */
 apiRoutes.post('/pairing/reject', async (req, res) => {
