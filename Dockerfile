@@ -1,5 +1,5 @@
 # ─── Stage 1: Build node-pty (requires native compilation) ─────────────────
-FROM node:22-bookworm-slim AS builder
+FROM node:24-bookworm-slim AS builder
 
 # node-pty needs python3, make, g++ to compile its native binding.
 # git is needed because transitive deps reference GitHub SSH URLs.
@@ -22,7 +22,7 @@ RUN npm install --omit=dev
 
 
 # ─── Stage 2: Runtime ────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim
+FROM node:24-bookworm-slim
 
 # OpenClaw version — set via Railway build args to pin a specific version.
 # Default is 2026.6.6 (latest stable): the template's CLI flags, provider
